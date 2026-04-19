@@ -4,37 +4,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cancer QoL Data Analyst Game</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Add interactive styling here */
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-        #game {
-            border: 2px solid #007bff;
+            background: linear-gradient(135deg, #f0f4f8, #d9e1e8);
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
             padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .level {
+            display: none;
+            margin-top: 20px;
+        }
+        .active {
+            display: block;
+        }
+        .multiple-choice {
+            margin: 10px 0;
+        }
+        .score {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div id="game">Loading game...</div>
+    <h1>Cancer QoL Data Analyst Game</h1>
+    <div id="game">
+        <div id="level-1" class="level active">
+            <h2>Level 1: Data Cleaning</h2>
+            <div class="multiple-choice">
+                <p>What is the first step in data cleaning?</p>
+                <button onclick="nextLevel(1)">Identify Missing Values</button>
+                <button onclick="nextLevel(1)">Remove Duplicates</button>
+                <button onclick="nextLevel(1)">Standardize Formats</button>
+                <button onclick="nextLevel(1)">All of the above</button>
+            </div>
+        </div>
+        <div id="level-2" class="level">
+            <h2>Level 2: Visualization</h2>
+            <canvas id="visualization"></canvas>
+            <div class="multiple-choice">
+                <p>What type of chart is best for showing trends over time?</p>
+                <button onclick="nextLevel(2)">Bar Chart</button>
+                <button onclick="nextLevel(2)">Line Chart</button>
+                <button onclick="nextLevel(2)">Pie Chart</button>
+                <button onclick="nextLevel(2)">Scatter Plot</button>
+            </div>
+        </div>
+        <div id="level-3" class="level">
+            <h2>Level 3: Interpretation</h2>
+            <div class="multiple-choice">
+                <p>What does a p-value less than 0.05 indicate?</p>
+                <button onclick="nextLevel(3)">Strong evidence against the null hypothesis</button>
+                <button onclick="nextLevel(3)">Weak evidence against the null hypothesis</button>
+                <button onclick="nextLevel(3)">No evidence to reject the null hypothesis</button>
+                <button onclick="nextLevel(3)">Cannot be determined</button>
+            </div>
+        </div>
+        <div id="level-4" class="level">
+            <h2>Level 4: Factor Analysis</h2>
+            <div class="multiple-choice">
+                <p>What is the primary goal of factor analysis?</p>
+                <button onclick="nextLevel(4)">Reduce dimensionality</button>
+                <button onclick="nextLevel(4)">Identify relationships</button>
+                <button onclick="nextLevel(4)">Both of the above</button>
+                <button onclick="nextLevel(4)">None of the above</button>
+            </div>
+        </div>
+    </div>
+    <div class="score">Score: <span id="score">0</span>/45</div>
     <script>
-        // Convert Python game logic to JavaScript here
-        function initializeGame() {
-            // Game initialization logic
-            document.getElementById('game').innerText = "Welcome to the Cancer QoL Data Analyst Game!";
-            // Additional game logic goes here
+        let currentLevel = 1;
+        let score = 0;
+
+        function nextLevel(level) {
+            currentLevel++;
+            if (level === 1) score += 10;
+            if (level === 2) score += 10;
+            if (level === 3) score += 10;
+            if (level === 4) score += 15;
+            document.getElementById('score').innerText = score;
+            displayLevel(currentLevel);
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            initializeGame();
-        });
+        function displayLevel(level) {
+            let levels = document.querySelectorAll('.level');
+            levels.forEach((lvl, index) => {
+                lvl.classList.remove('active');
+                if (index === level - 1) lvl.classList.add('active');
+            });
+            if (level > levels.length) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game').innerHTML = '<h2>Game Over!</h2><p>Your final score: ' + score + '/45</p>';
+        }
+
+        window.onload = function() {
+            displayLevel(currentLevel);
+        };
     </script>
 </body>
 </html>
