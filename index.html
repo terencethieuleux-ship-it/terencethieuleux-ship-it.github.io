@@ -227,8 +227,8 @@
                     title: "📋 Mission: Handle Missing QoL Data Properly",
                     description: "8% of your 60-patient dataset has missing QoL scores. How should you proceed?",
                     options: [
-                        { text: "Delete incomplete records (conservative approach)", correct: true, feedback: "Smart choice! Maintains data integrity." },
-                        { text: "Impute with mean values", correct: false, feedback: "This can introduce bias and mask patterns." },
+                        { text: "Delete incomplete records", correct: false, feedback: "This can introduce bias and mask patterns." },
+                        { text: "Impute with mean values", correct: true, feedback: "Smart choice it is the usual method!" },
                         { text: "Use forward fill method", correct: false, feedback: "Not appropriate for this data type." }
                     ]
                 },
@@ -245,7 +245,7 @@
                     title: "📊 Mission: Test Treatment Differences",
                     description: "Testing if QoL differs between 3 treatment groups (Surgery, Radiation, Chemotherapy)?",
                     options: [
-                        { text: "ANOVA (compares multiple groups)", correct: true, feedback: "Perfect! ANOVA handles 3+ groups." },
+                        { text: "ANOVA", correct: true, feedback: "Perfect! ANOVA handles 3+ groups." },
                         { text: "T-test", correct: false, feedback: "T-tests only compare 2 groups." },
                         { text: "Chi-square test", correct: false, feedback: "Chi-square is for categorical data." }
                     ]
