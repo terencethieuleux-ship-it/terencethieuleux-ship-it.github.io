@@ -30,6 +30,10 @@
         .stat-value { font-size: 2em; font-weight: 800; color: #667eea; }
         .badges-list { display: flex; flex-wrap: wrap; gap: 10px; }
         .badge { background: linear-gradient(135deg, #FFD700, #FFA500); color: white; padding: 8px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 700; }
+        .badge.gold { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .badge.silver { background: linear-gradient(135deg, #C0C0C0, #808080); color: white; }
+        .badge.bronze { background: linear-gradient(135deg, #CD7F32, #8B4513); color: white; }
+        .badge.diamond { background: linear-gradient(135deg, #00BFFF, #1E90FF); color: white; }
         .game-area { background: #f5f5f5; padding: 30px; border-radius: 15px; }
         .scenario-box { background: linear-gradient(135deg, #667eea15, #764ba215); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #667eea; }
         .scenario-title { color: #667eea; font-weight: 700; font-size: 1.2em; margin-bottom: 10px; }
@@ -50,9 +54,6 @@
         .progress-bar { background: #e0e0e0; height: 8px; border-radius: 10px; margin: 15px 0; overflow: hidden; }
         .progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; transition: width 0.3s; }
         .combo-counter { background: #fff3cd; border: 2px solid #ffc107; padding: 10px; border-radius: 10px; text-align: center; margin: 10px 0; font-weight: 700; color: #856404; }
-        .timer { color: #dc3545; font-weight: 700; }
-        .leaderboard { background: white; padding: 20px; border-radius: 10px; margin: 15px 0; }
-        .leaderboard-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #e0e0e0; }
     </style>
 </head>
 <body>
@@ -235,7 +236,6 @@
                 qualityOfLifeAnalysis: "Quality of Life Analysis in Cancer Patients",
                 readyForResearch: "Ready for independent research!",
                 continueBuilding: "Continue building analytical skills",
-                beginnerAnalyst: "Beginner Analyst 🏆",
                 comboText: "🔥 Combo: ",
                 correctAnswers: "Correct Answers: "
             },
@@ -248,7 +248,7 @@
                 scoreLabel: "Score Total",
                 accuracyLabel: "Précision",
                 levelCountLabel: "Niveaux Complétés",
-                badgesLabel: "🏆 Badges Gagnés",
+                badgesLabel: "🏆 Insignes Gagnés",
                 selectChallenge: "Sélectionnez Votre Défi",
                 level1Title: "Niveau 1: Détective des Données 🔍",
                 level1Desc: "Trouver et traiter les données manquantes (Facile → Expert)",
@@ -270,12 +270,11 @@
                 accuracy: "Précision",
                 keyFindings: "Résultats Clés",
                 recommendation: "Recommandation",
-                badgesEarned: "Badges Gagnés",
+                badgesEarned: "Insignes Gagnés",
                 researchStudyReport: "Rapport d'Étude de Recherche",
                 qualityOfLifeAnalysis: "Analyse de la Qualité de Vie chez les Patients Atteints de Cancer",
                 readyForResearch: "Prêt pour la recherche indépendante!",
                 continueBuilding: "Continuez à développer vos compétences analytiques",
-                beginnerAnalyst: "Analyste Débutant 🏆",
                 comboText: "🔥 Combo: ",
                 correctAnswers: "Réponses Correctes: "
             }
@@ -287,11 +286,9 @@
             currentLanguage = lang;
             document.documentElement.lang = lang;
             
-            // Update button states
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-            // Update all text content
             updatePageText();
         }
 
@@ -320,7 +317,6 @@
             document.getElementById('reportTitle').textContent = t.reportTitle;
             document.getElementById('playAgainBtn').textContent = t.playAgainBtn;
             
-            // Update back buttons
             document.getElementById('backBtn1').textContent = t.backBtn;
             document.getElementById('backBtn2').textContent = t.backBtn;
             document.getElementById('backBtn3').textContent = t.backBtn;
@@ -336,7 +332,55 @@
             badges: [],
             decisions: [],
             combo: 0,
-            lastCorrect: false
+            lastCorrect: false,
+            levelScores: [0, 0, 0, 0]
+        };
+
+        // Shuffle function for randomizing answer order
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        const badgeDefinitions = {
+            en: {
+                level1Perfect: "Data Master 🎯",
+                level1Perfect_desc: "Perfect score on Data Detective level",
+                level2Perfect: "Visualization Genius 📊",
+                level2Perfect_desc: "Perfect score on Visualization Expert level",
+                level3Perfect: "Statistical Wizard 📈",
+                level3Perfect_desc: "Perfect score on Statistical Analyst level",
+                level4Perfect: "Research Scholar 🏆",
+                level4Perfect_desc: "Perfect score on Research Scientist level",
+                easyMastery: "Easy Mode Expert 🎓",
+                normalMastery: "Balanced Analyst ⚖️",
+                hardMastery: "Challenge Conqueror 💪",
+                expertMastery: "Epidemiologist Elite 👑",
+                perfectRun: "Flawless Performance ✨",
+                comboKing: "Combo Master 🔥",
+                allBadges: "Legend Status 🌟"
+            },
+            fr: {
+                level1Perfect: "Maître des Données 🎯",
+                level1Perfect_desc: "Score parfait au niveau Détective des Données",
+                level2Perfect: "Génie de la Visualisation 📊",
+                level2Perfect_desc: "Score parfait au niveau Expert en Visualisation",
+                level3Perfect: "Magicien Statistique 📈",
+                level3Perfect_desc: "Score parfait au niveau Analyste Statistique",
+                level4Perfect: "Chercheur Érudit 🏆",
+                level4Perfect_desc: "Score parfait au niveau Chercheur Scientifique",
+                easyMastery: "Expert en Mode Facile 🎓",
+                normalMastery: "Analyste Équilibré ⚖️",
+                hardMastery: "Conquérant de Défis 💪",
+                expertMastery: "Élite Épidémiologiste 👑",
+                perfectRun: "Performance Impeccable ✨",
+                comboKing: "Maître du Combo 🔥",
+                allBadges: "Statut de Légende 🌟"
+            }
         };
 
         const questionsByDifficulty = {
@@ -351,8 +395,8 @@
                         description: "Vous avez des données de patients avec certaines valeurs manquantes. Quelle est la première étape?"
                     },
                     options: [
-                        { en: "Count missing values and assess the pattern", fr: "Compter les valeurs manquantes et évaluer le modèle", correct: true, en_feedback: "Good! Understanding the extent is crucial.", fr_feedback: "Bien ! Comprendre l'ampleur est crucial." },
-                        { en: "Delete everything and start over", fr: "Supprimer tout et recommencer", correct: false, en_feedback: "That would waste valuable data!", fr_feedback: "Cela gaspillerait des données précieuses!" }
+                        { en: "Delete everything and start over", fr: "Supprimer tout et recommencer", correct: false, en_feedback: "That would waste valuable data!", fr_feedback: "Cela gaspillerait des données précieuses!" },
+                        { en: "Count missing values and assess the pattern", fr: "Compter les valeurs manquantes et évaluer le motif", correct: true, en_feedback: "Good! Understanding the extent is crucial.", fr_feedback: "Bien ! Comprendre l'ampleur est crucial." }
                     ]
                 },
                 level2: {
@@ -365,8 +409,8 @@
                         description: "Vous voulez montrer comment la QoL change selon les stades du cancer. Quel est le mieux?"
                     },
                     options: [
-                        { en: "Line graph showing the trend", fr: "Graphique linéaire montrant la tendance", correct: true, en_feedback: "Perfect! Lines show trends effectively.", fr_feedback: "Parfait ! Les lignes montrent les tendances efficacement." },
-                        { en: "Pie chart", fr: "Graphique en camembert", correct: false, en_feedback: "Pie charts don't show trends well.", fr_feedback: "Les graphiques en camembert ne montrent pas bien les tendances." }
+                        { en: "Pie chart", fr: "Diagramme circulaire", correct: false, en_feedback: "Pie charts don't show trends well.", fr_feedback: "Les diagrammes circulaires ne montrent pas bien les tendances." },
+                        { en: "Line graph showing the trend", fr: "Graphique linéaire montrant la tendance", correct: true, en_feedback: "Perfect! Lines show trends effectively.", fr_feedback: "Parfait ! Les lignes montrent les tendances efficacement." }
                     ]
                 },
                 level3: {
@@ -376,11 +420,11 @@
                     },
                     fr: {
                         title: "📊 Mission: Comparer Deux Groupes",
-                        description: "Comparaison de la QoL entre les patients chirurgicaux et radiothérapie?"
+                        description: "Comparaison de la QoL entre patients chirurgicaux et radiothérapie?"
                     },
                     options: [
-                        { en: "Use a t-test", fr: "Utiliser un test t", correct: true, en_feedback: "Correct! T-tests compare means.", fr_feedback: "Correct ! Les tests t comparent les moyennes." },
-                        { en: "Use correlation", fr: "Utiliser une corrélation", correct: false, en_feedback: "Correlation measures relationships, not group differences.", fr_feedback: "La corrélation mesure les relations, pas les différences de groupe." }
+                        { en: "Use correlation", fr: "Utiliser une corrélation", correct: false, en_feedback: "Correlation measures relationships, not group differences.", fr_feedback: "La corrélation mesure les associations, pas les différences de groupe." },
+                        { en: "Use a t-test", fr: "Utiliser un test t", correct: true, en_feedback: "Correct! T-tests compare means.", fr_feedback: "Correct ! Les tests t comparent les moyennes." }
                     ]
                 },
                 level4: {
@@ -393,8 +437,8 @@
                         description: "Vos données montrent que le cancer de stade 4 = QoL plus faible. Que recommandez-vous?"
                     },
                     options: [
-                        { en: "Focus supportive care on advanced stage patients", fr: "Concentrer les soins de soutien sur les patients à stade avancé", correct: true, en_feedback: "Excellent! Data-driven recommendations.", fr_feedback: "Excellent ! Recommandations basées sur les données." },
-                        { en: "Ignore the findings", fr: "Ignorer les résultats", correct: false, en_feedback: "That contradicts your research!", fr_feedback: "Cela contredit votre recherche!" }
+                        { en: "Ignore the findings", fr: "Ignorer les résultats", correct: false, en_feedback: "That contradicts your research!", fr_feedback: "Cela contredit votre recherche!" },
+                        { en: "Focus supportive care on advanced stage patients", fr: "Concentrer les soins palliatifs sur les patients à stade avancé", correct: true, en_feedback: "Excellent! Data-driven recommendations.", fr_feedback: "Excellent ! Recommandations fondées sur les données." }
                     ]
                 }
             },
@@ -409,9 +453,9 @@
                         description: "8% de votre ensemble de données de 60 patients ont des scores QoL manquants. Comment devez-vous procéder?"
                     },
                     options: [
-                        { en: "Delete incomplete records", fr: "Supprimer les dossiers incomplets", correct: false, en_feedback: "This can introduce bias and mask patterns.", fr_feedback: "Cela peut introduire un biais et masquer les modèles." },
-                        { en: "Impute with mean values", fr: "Imputer avec des valeurs moyennes", correct: true, en_feedback: "Smart choice it is the usual method!", fr_feedback: "Choix intelligent, c'est la méthode habituelle!" },
-                        { en: "Use forward fill method", fr: "Utiliser la méthode de remplissage avant", correct: false, en_feedback: "Not appropriate for this data type.", fr_feedback: "Non approprié pour ce type de données." }
+                        { en: "Use forward fill method", fr: "Utiliser la méthode de remplissage avant", correct: false, en_feedback: "Not appropriate for this data type.", fr_feedback: "Non approprié pour ce type de données." },
+                        { en: "Delete incomplete records", fr: "Supprimer les dossiers incomplets", correct: false, en_feedback: "This can introduce bias and mask patterns.", fr_feedback: "Cela peut introduire un biais et masquer les motifs." },
+                        { en: "Impute with mean values", fr: "Imputer avec des valeurs moyennes", correct: true, en_feedback: "Smart choice, it is the usual method!", fr_feedback: "Bon choix, c'est la méthode habituelle!" }
                     ]
                 },
                 level2: {
@@ -420,13 +464,13 @@
                         description: "Your data shows QoL: Stage I=78, II=68, III=58, IV=48. How to present?"
                     },
                     fr: {
-                        title: "📊 Mission: Visualiser les Modèles QoL Dépendants du Stade",
+                        title: "📊 Mission: Visualiser les Motifs QoL Dépendants du Stade",
                         description: "Vos données montrent QoL: Stade I=78, II=68, III=58, IV=48. Comment présenter?"
                     },
                     options: [
-                        { en: "Line chart with markers", fr: "Graphique linéaire avec marqueurs", correct: true, en_feedback: "Great! Shows declining trend clearly.", fr_feedback: "Super ! Affiche clairement la tendance décroissante." },
                         { en: "Stacked bar chart", fr: "Graphique en barres empilées", correct: false, en_feedback: "Not appropriate for this data.", fr_feedback: "Non approprié pour ces données." },
-                        { en: "Scatter plot", fr: "Diagramme de dispersion", correct: false, en_feedback: "Less effective for ordered categories.", fr_feedback: "Moins efficace pour les catégories ordonnées." }
+                        { en: "Scatter plot", fr: "Diagramme de dispersion", correct: false, en_feedback: "Less effective for ordered categories.", fr_feedback: "Moins efficace pour les catégories ordonnées." },
+                        { en: "Line chart with markers", fr: "Graphique linéaire avec marqueurs", correct: true, en_feedback: "Great! Shows declining trend clearly.", fr_feedback: "Super ! Affiche clairement la tendance décroissante." }
                     ]
                 },
                 level3: {
@@ -439,9 +483,9 @@
                         description: "Tester si la QoL diffère entre 3 groupes de traitement (Chirurgie, Radiothérapie, Chimiothérapie)?"
                     },
                     options: [
-                        { en: "ANOVA", fr: "ANOVA", correct: true, en_feedback: "Perfect! ANOVA handles 3+ groups.", fr_feedback: "Parfait ! ANOVA gère 3+ groupes." },
-                        { en: "T-test", fr: "Test T", correct: false, en_feedback: "T-tests only compare 2 groups.", fr_feedback: "Les tests t comparent uniquement 2 groupes." },
-                        { en: "Chi-square test", fr: "Test du chi-carré", correct: false, en_feedback: "Chi-square is for categorical data.", fr_feedback: "Le chi-carré est pour les données catégoriques." }
+                        { en: "Chi-square test", fr: "Test du chi-carré", correct: false, en_feedback: "Chi-square is for categorical data.", fr_feedback: "Le test du chi-carré est pour les données catégoriques." },
+                        { en: "T-test", fr: "Test t", correct: false, en_feedback: "T-tests only compare 2 groups.", fr_feedback: "Les tests t comparent uniquement 2 groupes." },
+                        { en: "ANOVA", fr: "ANOVA", correct: true, en_feedback: "Perfect! ANOVA handles 3+ groups.", fr_feedback: "Parfait ! L'ANOVA gère 3+ groupes." }
                     ]
                 },
                 level4: {
@@ -454,9 +498,9 @@
                         description: "L'analyse montre : Le stade affecte la QoL (p<0,001) ET l'âge interagit avec le stade (p=0,02). Conclusion?"
                     },
                     options: [
-                        { en: "Age modifies stage's effect on QoL - tailor interventions", fr: "L'âge modifie l'effet du stade sur la QoL - adapter les interventions", correct: true, en_feedback: "Excellent interpretation!", fr_feedback: "Excellente interprétation!" },
+                        { en: "Stage has no real effect", fr: "Le stade n'a pas d'effet réel", correct: false, en_feedback: "p<0.001 clearly shows significance.", fr_feedback: "p<0,001 montre clairement la significativité." },
                         { en: "Ignore the age interaction, focus only on stage", fr: "Ignorer l'interaction d'âge, se concentrer uniquement sur le stade", correct: false, en_feedback: "You'd miss important clinical nuance.", fr_feedback: "Vous manqueriez une nuance clinique importante." },
-                        { en: "Stage has no real effect", fr: "Le stade n'a pas d'effet réel", correct: false, en_feedback: "p<0.001 clearly shows significance.", fr_feedback: "p<0,001 montre clairement la significativité." }
+                        { en: "Age modifies stage's effect on QoL - tailor interventions", fr: "L'âge modifie l'effet du stade sur la QoL - adapter les interventions", correct: true, en_feedback: "Excellent interpretation!", fr_feedback: "Excellente interprétation!" }
                     ]
                 }
             },
@@ -464,16 +508,16 @@
                 level1: {
                     en: {
                         title: "📋 Mission: Address Missing Data Bias",
-                        description: "Missing data: 12% Physical, 8% Emotional, but Missing Completely At Random (MCAR). Strategy?"
+                        description: "Missing data: 12% Physical, 8% Emotional, MCAR (Missing Completely At Random). Strategy?"
                     },
                     fr: {
-                        title: "📋 Mission: Aborder le Biais des Données Manquantes",
-                        description: "Données manquantes: 12% Physique, 8% Émotionnel, mais Manquant Complètement Au Hasard (MCAR). Stratégie?"
+                        title: "📋 Mission: Traiter le Biais des Données Manquantes",
+                        description: "Données manquantes: 12% Physique, 8% Émotionnel, MCAR (Manquant Complètement Au Hasard). Stratégie?"
                     },
                     options: [
-                        { en: "Listwise deletion (removes entire record if any missing)", fr: "Suppression listwise (supprime le dossier entier si un élément manque)", correct: true, en_feedback: "Good! Preserves valid comparisons with MCAR.", fr_feedback: "Bien ! Préserve les comparaisons valides avec MCAR." },
-                        { en: "Multiple imputation (iterative approach)", fr: "Imputation multiple (approche itérative)", correct: false, en_feedback: "Better for Missing At Random (MAR), not MCAR.", fr_feedback: "Meilleur pour Manquant Au Hasard (MAR), pas MCAR." },
-                        { en: "Pairwise deletion", fr: "Suppression pairwise", correct: false, en_feedback: "Can introduce bias with unbalanced data.", fr_feedback: "Peut introduire un biais avec des données déséquilibrées." }
+                        { en: "Multiple imputation (iterative approach)", fr: "Imputation multiple (approche itérative)", correct: false, en_feedback: "Better for Missing At Random (MAR), not MCAR.", fr_feedback: "Meilleure pour Manquant Au Hasard (MAR), pas MCAR." },
+                        { en: "Pairwise deletion", fr: "Suppression par paires", correct: false, en_feedback: "Can introduce bias with unbalanced data.", fr_feedback: "Peut introduire un biais avec des données déséquilibrées." },
+                        { en: "Listwise deletion (removes entire record if any missing)", fr: "Suppression listwise (supprime la ligne entière si manquante)", correct: true, en_feedback: "Good! Preserves valid comparisons with MCAR.", fr_feedback: "Bien ! Préserve les comparaisons valides avec MCAR." }
                     ]
                 },
                 level2: {
@@ -486,9 +530,9 @@
                         description: "Besoin d'afficher la distribution QoL PAR stade ET type de traitement. Meilleure approche?"
                     },
                     options: [
-                        { en: "Grouped/faceted line plots", fr: "Graphiques linéaires groupés/facettisés", correct: true, en_feedback: "Perfect! Shows interactions clearly.", fr_feedback: "Parfait ! Affiche clairement les interactions." },
+                        { en: "4 separate pie charts", fr: "4 diagrammes circulaires séparés", correct: false, en_feedback: "Pie charts don't show distributions well.", fr_feedback: "Les diagrammes circulaires ne montrent pas bien les distributions." },
                         { en: "Single overlay plot with 8 lines", fr: "Tracé de superposition unique avec 8 lignes", correct: false, en_feedback: "Would be cluttered and hard to read.", fr_feedback: "Serait encombré et difficile à lire." },
-                        { en: "4 separate pie charts", fr: "4 graphiques en camembert séparés", correct: false, en_feedback: "Pie charts don't show distributions well.", fr_feedback: "Les graphiques en camembert ne montrent pas bien les distributions." }
+                        { en: "Grouped/faceted line plots", fr: "Graphiques linéaires groupés/stratifiés", correct: true, en_feedback: "Perfect! Shows interactions clearly.", fr_feedback: "Parfait ! Affiche clairement les interactions." }
                     ]
                 },
                 level3: {
@@ -497,13 +541,13 @@
                         description: "Testing QoL differences across 4 stages. Data: non-normal, unequal variances. Test?"
                     },
                     fr: {
-                        title: "📊 Mission: Choisir un Test Approprié avec des Hypothèses",
-                        description: "Test des différences QoL entre 4 stades. Données: non-normal, variances inégales. Test?"
+                        title: "📊 Mission: Choisir un Test Approprié Selon les Hypothèses",
+                        description: "Test des différences QoL entre 4 stades. Données: non-normales, variances inégales. Test?"
                     },
                     options: [
-                        { en: "Kruskal-Wallis (non-parametric alternative to ANOVA)", fr: "Kruskal-Wallis (alternative non-paramétrique à ANOVA)", correct: true, en_feedback: "Excellent! Handles violations perfectly.", fr_feedback: "Excellent ! Gère parfaitement les violations." },
-                        { en: "Regular ANOVA", fr: "ANOVA régulière", correct: false, en_feedback: "Assumes normality and equal variance.", fr_feedback: "Suppose la normalité et l'égalité des variances." },
-                        { en: "Linear regression", fr: "Régression linéaire", correct: false, en_feedback: "Assumes normal residuals.", fr_feedback: "Suppose des résidus normaux." }
+                        { en: "Regular ANOVA", fr: "ANOVA paramétrique", correct: false, en_feedback: "Assumes normality and equal variance.", fr_feedback: "Suppose la normalité et l'homogénéité des variances." },
+                        { en: "Linear regression", fr: "Régression linéaire", correct: false, en_feedback: "Assumes normal residuals.", fr_feedback: "Suppose des résidus normaux." },
+                        { en: "Kruskal-Wallis (non-parametric alternative to ANOVA)", fr: "Kruskal-Wallis (test non-paramétrique)", correct: true, en_feedback: "Excellent! Handles violations perfectly.", fr_feedback: "Excellent ! Gère parfaitement les violations." }
                     ]
                 },
                 level4: {
@@ -516,9 +560,9 @@
                         description: "Grand échantillon: p<0,001 pour la différence QoL (Stade I: 78 vs Stade IV: 76). Recommandation?"
                     },
                     options: [
-                        { en: "2-point difference may not be clinically meaningful despite statistical significance", fr: "La différence de 2 points peut ne pas être cliniquement significative malgré la significativité statistique", correct: true, en_feedback: "Brilliant! You understand practical significance.", fr_feedback: "Brillant ! Vous comprenez la significativité pratique." },
-                        { en: "p<0.001 means implement interventions immediately", fr: "p<0,001 signifie mettre en œuvre des interventions immédiatement", correct: false, en_feedback: "Need to consider effect size!", fr_feedback: "Besoin de considérer la taille de l'effet!" },
-                        { en: "Difference is too small to matter", fr: "La différence est trop petite pour avoir de l'importance", correct: false, en_feedback: "Context and sample size matter.", fr_feedback: "Le contexte et la taille de l'échantillon comptent." }
+                        { en: "p<0.001 means implement interventions immediately", fr: "p<0,001 signifie mettre en œuvre les interventions immédiatement", correct: false, en_feedback: "Need to consider effect size!", fr_feedback: "Besoin de considérer la taille de l'effet!" },
+                        { en: "Difference is too small to matter", fr: "La différence est trop petite pour être pertinente", correct: false, en_feedback: "Context and sample size matter.", fr_feedback: "Le contexte et la taille de l'échantillon comptent." },
+                        { en: "2-point difference may not be clinically meaningful despite statistical significance", fr: "La différence de 2 points peut ne pas être cliniquement significative malgré la significativité statistique", correct: true, en_feedback: "Brilliant! You understand practical significance.", fr_feedback: "Brillant ! Vous comprenez la significativité pratique." }
                     ]
                 }
             },
@@ -533,9 +577,9 @@
                         description: "Les patients avec QoL faible ont sauté des éléments → MNAR (Manquant Pas Au Hasard). Atténuation?"
                     },
                     options: [
-                        { en: "Use sensitivity analysis & pattern-mixture models", fr: "Utiliser l'analyse de sensibilité et les modèles de mélange de modèles", correct: true, en_feedback: "Advanced! You understand MNAR complexity.", fr_feedback: "Avancé ! Vous comprenez la complexité du MNAR." },
                         { en: "Simple mean imputation", fr: "Imputation simple de la moyenne", correct: false, en_feedback: "Dangerously biased with MNAR.", fr_feedback: "Dangereusement biaisé avec MNAR." },
-                        { en: "Ignore mechanism, use standard methods", fr: "Ignorer le mécanisme, utiliser les méthodes standard", correct: false, en_feedback: "Would violate statistical assumptions.", fr_feedback: "Violerait les hypothèses statistiques." }
+                        { en: "Ignore mechanism, use standard methods", fr: "Ignorer le mécanisme, utiliser les méthodes standard", correct: false, en_feedback: "Would violate statistical assumptions.", fr_feedback: "Violerait les hypothèses statistiques." },
+                        { en: "Use sensitivity analysis & pattern-mixture models", fr: "Utiliser les analyses de sensibilité et modèles mixtes", correct: true, en_feedback: "Advanced! You understand MNAR complexity.", fr_feedback: "Avancé ! Vous comprenez la complexité du MNAR." }
                     ]
                 },
                 level2: {
@@ -544,13 +588,13 @@
                         description: "Need to show: QoL by stage, by treatment, by age, by gender. Visualization?"
                     },
                     fr: {
-                        title: "📊 Mission: Communiquer des Modèles Multivariés Complexes",
+                        title: "📊 Mission: Communiquer des Motifs Multivariés Complexes",
                         description: "Besoin d'afficher: QoL par stade, par traitement, par âge, par sexe. Visualisation?"
                     },
                     options: [
-                        { en: "Heat map with facets or interactive dashboard", fr: "Carte thermique avec facettes ou tableau de bord interactif", correct: true, en_feedback: "Perfect for high-dimensional data!", fr_feedback: "Parfait pour les données de haute dimension!" },
+                        { en: "4 separate tables", fr: "4 tableaux séparés", correct: false, en_feedback: "Poor for pattern recognition.", fr_feedback: "Mauvais pour la reconnaissance de motifs." },
                         { en: "Single line plot with 16 lines", fr: "Tracé linéaire unique avec 16 lignes", correct: false, en_feedback: "Would be incomprehensible.", fr_feedback: "Serait incompréhensible." },
-                        { en: "4 separate tables", fr: "4 tableaux séparés", correct: false, en_feedback: "Poor for pattern recognition.", fr_feedback: "Mauvais pour la reconnaissance de modèles." }
+                        { en: "Heat map with facets or interactive dashboard", fr: "Carte thermique stratifiée ou tableau de bord interactif", correct: true, en_feedback: "Perfect for high-dimensional data!", fr_feedback: "Parfait pour les données de haute dimension!" }
                     ]
                 },
                 level3: {
@@ -563,9 +607,9 @@
                         description: "QoL mesurée à plusieurs reprises à 0, 3, 6, 12 mois en grappes (hôpitaux). Analyse?"
                     },
                     options: [
-                        { en: "Mixed-effects model with random intercepts/slopes", fr: "Modèle à effets mixtes avec intercepts/pentes aléatoires", correct: true, en_feedback: "Excellent! Accounts for hierarchy & repeated measures.", fr_feedback: "Excellent ! Tient compte de la hiérarchie et des mesures répétées." },
+                        { en: "Regular ANOVA", fr: "ANOVA simple", correct: false, en_feedback: "Violates independence assumption.", fr_feedback: "Viole l'hypothèse d'indépendance." },
                         { en: "Simple t-tests at each timepoint", fr: "Tests t simples à chaque point temporel", correct: false, en_feedback: "Ignores clustering and correlation.", fr_feedback: "Ignore le clustering et la corrélation." },
-                        { en: "Regular ANOVA", fr: "ANOVA régulière", correct: false, en_feedback: "Violates independence assumption.", fr_feedback: "Viole l'hypothèse d'indépendance." }
+                        { en: "Mixed-effects model with random intercepts/slopes", fr: "Modèle à effets mixtes avec intercepts/pentes aléatoires", correct: true, en_feedback: "Excellent! Accounts for hierarchy & repeated measures.", fr_feedback: "Excellent ! Tient compte de la hiérarchie et des mesures répétées." }
                     ]
                 },
                 level4: {
@@ -578,9 +622,9 @@
                         description: "Les résultats significatifs contredisent les études antérieures. Recommandation avant publication?"
                     },
                     options: [
-                        { en: "Conduct pre-specified sensitivity analyses & report all analyses (registered report)", fr: "Mener des analyses de sensibilité préspécifiées et signaler toutes les analyses (rapport enregistré)", correct: true, en_feedback: "Exemplary! Addresses reproducibility crisis.", fr_feedback: "Exemplaire ! Résout la crise de la reproductibilité." },
-                        { en: "Publish only significant results to look impressive", fr: "Publier uniquement les résultats significatifs pour avoir l'air impressionnant", correct: false, en_feedback: "Contributes to publication bias.", fr_feedback: "Contribue au biais de publication." },
-                        { en: "Hide contradictory findings", fr: "Cacher les résultats contradictoires", correct: false, en_feedback: "Scientific integrity violation!", fr_feedback: "Violation de l'intégrité scientifique!" }
+                        { en: "Hide contradictory findings", fr: "Cacher les résultats contradictoires", correct: false, en_feedback: "Scientific integrity violation!", fr_feedback: "Violation de l'intégrité scientifique!" },
+                        { en: "Publish only significant results to look impressive", fr: "Publier uniquement les résultats significatifs pour paraître impressionnant", correct: false, en_feedback: "Contributes to publication bias.", fr_feedback: "Contribue au biais de publication." },
+                        { en: "Conduct pre-specified sensitivity analyses & report all analyses (registered report)", fr: "Mener des analyses de sensibilité préspécifiées et signaler toutes les analyses (rapport enregistré)", correct: true, en_feedback: "Exemplary! Addresses reproducibility crisis.", fr_feedback: "Exemplaire ! Résout la crise de la reproductibilité." }
                     ]
                 }
             }
@@ -593,13 +637,25 @@
         }
 
         function startLevel(level) {
+            // Clear feedback from previous level
+            for(let i = 1; i <= 4; i++) {
+                const feedback = document.getElementById(`feedback${i}`);
+                if(feedback) {
+                    feedback.style.display = 'none';
+                    feedback.innerHTML = '';
+                }
+            }
+
             gameState.currentLevel = level;
             document.getElementById('levelSelection').classList.add('hidden');
             document.getElementById(`level${level}`).classList.remove('hidden');
             
             const levelData = questionsByDifficulty[gameState.difficulty][`level${level}`];
             const langData = levelData[currentLanguage];
-            const options = levelData.options;
+            let options = levelData.options;
+            
+            // Shuffle options so correct answer isn't always in same position
+            options = shuffleArray(options);
             
             document.getElementById(`level${level}GameTitle`).textContent = langData.title;
             document.getElementById(`level${level}GameDescription`).textContent = langData.description;
@@ -630,22 +686,18 @@
                 gameState.correctAnswers++;
                 gameState.combo++;
                 gameState.lastCorrect = true;
+                gameState.levelScores[level - 1] = level === 4 ? 15 : 10;
                 feedbackDiv.innerHTML = `<strong>${feedback}</strong>`;
                 feedbackDiv.className = 'feedback-box feedback-correct';
                 
-                // Show combo
                 if(gameState.combo > 1) {
                     const comboDiv = document.getElementById('comboCounter');
                     comboDiv.classList.remove('hidden');
                     comboDiv.textContent = `${translations[currentLanguage].comboText}${gameState.combo}`;
                 }
-                
-                if(gameState.correctAnswers === 4) {
-                    const badge = currentLanguage === 'en' ? translations[currentLanguage].beginnerAnalyst : translations[currentLanguage].beginnerAnalyst;
-                    addBadge(badge);
-                }
             } else {
                 gameState.score += level === 4 ? 5 : 3;
+                gameState.levelScores[level - 1] = level === 4 ? 5 : 3;
                 gameState.combo = 0;
                 document.getElementById('comboCounter').classList.add('hidden');
                 feedbackDiv.innerHTML = `<strong>${feedback}</strong>`;
@@ -654,6 +706,7 @@
             
             gameState.totalAnswers++;
             updateStats();
+            checkLevelBadges(level, correct);
             
             setTimeout(() => {
                 document.getElementById(`level${level}`).classList.add('hidden');
@@ -665,6 +718,45 @@
             }, 2500);
         }
 
+        function checkLevelBadges(level, correct) {
+            const t = badgeDefinitions[currentLanguage];
+            
+            // Perfect score on specific level (40 points max per level: 4 levels × 10)
+            if(correct && gameState.levelScores[level - 1] === (level === 4 ? 15 : 10)) {
+                if(level === 1) addBadge(t.level1Perfect, "gold");
+                else if(level === 2) addBadge(t.level2Perfect, "gold");
+                else if(level === 3) addBadge(t.level3Perfect, "gold");
+                else if(level === 4) addBadge(t.level4Perfect, "gold");
+            }
+        }
+
+        function checkDifficultyBadges() {
+            const t = badgeDefinitions[currentLanguage];
+            
+            // Check perfect run (all 4 levels correct)
+            if(gameState.correctAnswers === 4) {
+                addBadge(t.perfectRun, "diamond");
+            }
+            
+            // Check combo master (3+ combo streak)
+            if(gameState.combo >= 3) {
+                addBadge(t.comboKing, "silver");
+            }
+            
+            // Difficulty-based badges
+            if(gameState.score >= 40) {
+                if(gameState.difficulty === 'easy') addBadge(t.easyMastery, "gold");
+                else if(gameState.difficulty === 'normal') addBadge(t.normalMastery, "silver");
+                else if(gameState.difficulty === 'hard') addBadge(t.hardMastery, "bronze");
+                else if(gameState.difficulty === 'expert') addBadge(t.expertMastery, "diamond");
+            }
+            
+            // Legend status (6+ badges)
+            if(gameState.badges.length >= 6) {
+                addBadge(t.allBadges, "diamond");
+            }
+        }
+
         function updateStats() {
             document.getElementById('totalScore').textContent = gameState.score;
             document.getElementById('accuracy').textContent = gameState.totalAnswers > 0 ? 
@@ -674,13 +766,14 @@
             document.getElementById('progressFill').style.width = progress + '%';
         }
 
-        function addBadge(badge) {
+        function addBadge(badge, badgeType = "gold") {
             if(!gameState.badges.includes(badge)) {
                 gameState.badges.push(badge);
                 const badgesList = document.getElementById('badgesList');
                 const badgeEl = document.createElement('div');
-                badgeEl.className = 'badge';
+                badgeEl.className = `badge ${badgeType}`;
                 badgeEl.textContent = badge;
+                badgeEl.title = badgeType.toUpperCase();
                 badgesList.appendChild(badgeEl);
             }
         }
@@ -724,6 +817,8 @@
         }
 
         function generateReport() {
+            checkDifficultyBadges();
+            
             const t = translations[currentLanguage];
             const difficulty = gameState.difficulty.charAt(0).toUpperCase() + gameState.difficulty.slice(1);
             const reportHTML = `
@@ -731,7 +826,7 @@
                 <p><strong>${t.institution}:</strong> UF3596 CHU Martinique</p>
                 <p><strong>${t.studyTitle}:</strong> ${t.qualityOfLifeAnalysis}</p>
                 <p><strong>${t.difficultyLevel}:</strong> ${difficulty}</p>
-                <p><strong>${t.finalScore}:</strong> ${gameState.score}/45 points</p>
+                <p><strong>${t.finalScore}:</strong> ${gameState.score}/60 points</p>
                 <p><strong>${t.accuracy}:</strong> ${Math.round((gameState.correctAnswers / gameState.totalAnswers) * 100)}%</p>
                 <p><strong>${t.keyFindings}:</strong></p>
                 <ul>
@@ -740,7 +835,7 @@
                     <li>Applied appropriate statistical methods</li>
                     <li>Made evidence-based research recommendations</li>
                 </ul>
-                <p><strong>${t.recommendation}:</strong> ${gameState.score >= 40 ? t.readyForResearch : t.continueBuilding}</p>
+                <p><strong>${t.recommendation}:</strong> ${gameState.score >= 50 ? t.readyForResearch : t.continueBuilding}</p>
                 <p><strong>${t.badgesEarned}:</strong> ${gameState.badges.length > 0 ? gameState.badges.join(', ') : 'None yet'}</p>
             `;
             
@@ -767,7 +862,8 @@
                 badges: [],
                 decisions: [],
                 combo: 0,
-                lastCorrect: false
+                lastCorrect: false,
+                levelScores: [0, 0, 0, 0]
             };
             updateStats();
             document.getElementById('badgesList').innerHTML = '';
@@ -776,7 +872,6 @@
             backToLevel();
         }
 
-        // Initialize page text on load
         updatePageText();
     </script>
 </body>
